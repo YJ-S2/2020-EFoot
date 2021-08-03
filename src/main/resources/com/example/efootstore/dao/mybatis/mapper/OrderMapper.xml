@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.efootstore.dao.mybatis.mapper.OrderMapper">
+
+  <cache />
+
+  <select id="getOrder" resultType="Order">
+    select *
+    FROM "ORDER" 
+    WHERE "ORDER".ORDERID = #{orderId}
+      
+  </select>
+
+  <select id="getOrdersByUsername" resultType="Order">
+    SELECT	*
+    FROM "ORDER"
+    WHERE "ORDER".USERID = #{userId}
+  </select>
+  
+  <select id="getOrderList" resultType="Order">
+    SELECT *
+    FROM "ORDER"
+  </select>
+  
+  <insert id="insertOrder" parameterType="Order">
+  <selectKey keyProperty="orderId" resultType="Order"
+			order="BEFORE">
+			SELECT orderId_seq.nextval AS "orderId" FROM DUAL
+		</selectKey>
+    INSERT INTO "ORDER" (ORDERID, USERID, ORDERDATE, TOTALPRICE , EXPIRYDATE, CARDTYPE, CARDNUMBER, ORDERADDRESS, ORDERZIP, SALEID)
+    VALUES(#{orderId}, #{userId}, SYSDATE, #{totalPrice}, #{expiryDate}, #{cardType}, #{cardNumber}, #{orderAddress}, #{orderZip}, #{saleId})
+  </insert>
+
+  <select id="getList" resultType="String">
+    SELECT	I.PRICE, I.NAME, I.SALEID
+    FROM "ORDER" O ,ITEM I
+    WHERE O.SALEID=#{saleId} AND  O.SALEID= I.SALEID
+  </select>
+  
+ 
+</mapper>

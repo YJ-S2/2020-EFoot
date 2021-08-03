@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.example.efootstore.dao.mybatis.mapper.AuctionMapper">
+	<cache />
+	<!-- auction -->
+	<!-- Auction getAuction(String aucId) -->
+	<select id="getAuction"
+		resultType="com.example.efootstore.domain.Auction">
+		SELECT *
+		FROM AUCTION
+		WHERE AUCID=#{aucId}
+	</select>
+
+	<!-- List<Auction> getAuctionList() -->
+
+	<select id="getAuctionList"
+		resultType="com.example.efootstore.domain.Auction">
+		SELECT *
+		FROM AUCTION
+	</select>
+
+	<select id="getAuctionListByHeader"
+		resultType="com.example.efootstore.domain.Auction">
+		SELECT *
+		FROM AUCTION
+		WHERE USERID=#{userId}
+	</select>
+
+	<!-- List<Account> getAuctionApplierList(String aucId) -->
+
+
+	<select id="getApplyerOfAuction"
+		resultType="com.example.efootstore.domain.Auction">
+		SELECT *
+		FROM ACCOUNT A, AUCTIONAPPLIER C
+		WHERE
+		C.AUCID=#{aucId} AND
+		A.USERID=C.USERID
+		ORDER BY C.PRICE DESC
+	</select>
+
+
+	<!-- List<Auction> getAuctionApplyer(String userId) -->
+
+
+	<select id="getMyAuction"
+		resultType="com.example.efootstore.domain.Auction">
+	SELECT A.AUCID AS "aucId", 
+  		A.USERID AS "userId", 
+  		A.DEADLINE AS "deadLine", 
+  		A.PLACE AS "place", 
+  		A.CONTENT AS "CONTENT",
+  		A.TIMESTAMP AS "timeStamp", 
+  		A.NAME AS "name",
+  		A.STARTPRICE AS "startPrice",
+  		A.FINALPRICE AS "finalPrice",
+  		AA.PRICE AS "price"
+  	FROM AUCTION A , AUCTIONAPPLIER AA
+  	WHERE AA.USERID=#{userId} AND A.AUCID=AA.AUCID
+	
+	</select>
+
+
+	<select id="getAuctionItem"
+		resultType="com.example.efootstore.domain.Item">
+		SELECT ITEMID, NAME, PRICE, AUCID
+		FROM ITEM
+		WHERE
+		AUCID=#{aucId}
+	</select>
+
+	<!--void insertAuction(Auction auc) -->
+
+
+	<insert id="insertAuction"
+		parameterType="com.example.efootstore.domain.Auction">
+		<selectKey keyProperty="aucId" resultType="String"
+			order="BEFORE">
+			SELECT aucId_seq.nextval AS "aucId" FROM DUAL
+		</selectKey>
+		INSERT INTO AUCTION(AUCID, STARTDATE, DEADLINE, PLACE,CONTENT,
+		STARTPRICE, FINALPRICE, USERID, TIMESTAMP, NAME )
+		VALUES(#{aucId}, #{startDate}, #{deadLine}, #{place}, #{content}, #{startPrice}, #{finalPrice},
+		#{userId}, SYSDATE, #{name})
+	</insert>
+
+
+	<insert id="insertAuctionItem"
+		parameterType="com.example.efootstore.domain.Item">
+		<selectKey keyProperty="itemId" resultType="String"
+			order="BEFORE">
+			SELECT itemId_seq.nextval AS "itemId" FROM DUAL
+		</selectKey>
+		INSERT INTO ITEM(ITEMID, NAME, PRICE,AUCID, GBID, SHID, SALEID)
+		VALUES(#{itemId}, #{name}, #{finalPrice}, #{aucId}, null,null,null )
+	</insert>
+
+
+	<!-- void updateAuction(Auction auc) -->
+
+ 
+		
+	<update id="updateAuction" parameterType="Auction">
+		UPDATE AUCTION SET
+		NAME = #{name},
+		CONTENT = #{content},
+		STARTDATE = #{startDate},
+		DEADLINE = #{deadLine},
+		PLACE = #{place},
+		STARTPRICE = #{startPrice}
+		WHERE AUCID = #{aucId}
+	</update>
+
+	<update id="updateAuctionItem"
+		parameterType="com.example.efootstore.domain.Item">
+		UPDATE ITEM
+		SET NAME=#{name},
+		PRICE=#{finalPrice}
+		WHERE
+		AUCID=#{aucId}
+	</update>
+
+
+	<!-- -void deleteAuction(Auction auc) -->
+
+	<delete id="deleteAuction">
+		DELETE FROM AUCTION
+		WHERE AUCID=#{aucId}
+	</delete>
+
+	<delete id="deleteAuctionItem" parameterType="java.lang.String">
+		DELETE FROM ITEM
+		WHERE AUCID=#{aucId}
+	</delete>
+
+	<delete id="deleteAuctionApplyer"
+		parameterType="java.lang.String">
+		DELETE FROM AUCTIONAPPLIER
+		WHERE AUCID=#{aucId}
+	</delete>
+
+	<!-- apply -->
+	<insert id="applyAuction" parameterType="auction">
+		INSERT INTO
+		AUCTIONAPPLIER(AUCID,USERID,PRICE)
+		VALUES (#{aucId},#{userId},#{price})
+	</insert>
+
+	<delete id="cancelApplyAuction" parameterType="java.lang.String">
+		DELETE FROM AUCTIONAPPLIER
+		WHERE AUCID=#{aucId} AND USERID=#{userId}
+	</delete>
+
+</mapper>

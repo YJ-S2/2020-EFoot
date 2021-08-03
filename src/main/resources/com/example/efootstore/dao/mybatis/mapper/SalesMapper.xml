@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.efootstore.dao.mybatis.mapper.SalesMapper">
+  <cache />
+  
+  	<select id="getSalesListByCategory"
+  		resultType="Sales" parameterType="String">
+  		SELECT userId, NAME AS "ItemName", saleId
+  		FROM SALES
+  		WHERE CATEID = #{categoryId}
+  	</select>
+  
+	<select id="getSalesListByUserId"
+		resultType="com.example.efootstore.domain.Sales">
+		SELECT s.SALEID, s.USERID, s.NAME AS "ItemName", s.CATEID, s.content, i.price AS "item.price"
+		FROM SALES s, item i
+		WHERE s.saleid = i.saleid and s.USERID = #{userId}
+	</select>
+	
+	<select id="getSales"
+		resultType="com.example.efootstore.domain.Sales">
+		SELECT s.SALEID, s.USERID, s.NAME AS "ItemName", s.CATEID, s.content, i.price AS "item.price", IMAGE
+		FROM SALES s, item i
+		WHERE s.saleid = i.saleid and s.SALEID = #{salesId}
+	</select>
+	
+	<insert id="insertSales"
+		parameterType="com.example.efootstore.domain.Sales">
+		<selectKey keyProperty="saleId" resultType="String" order="BEFORE">
+  		SELECT saleId_seq.nextval AS "saleId" FROM DUAL
+  		</selectKey>
+		INSERT INTO SALES(SALEID, USERID, NAME, CATEID, CONTENT, IMAGE)
+		VALUES(#{saleId}, #{userId}, #{ItemName}, #{cateId}, #{content}, #{image})
+	</insert>
+
+	
+	<insert id="insertSalesItem"
+		parameterType="com.example.efootstore.domain.Item">
+		<selectKey keyProperty="itemId" resultType="String" order="BEFORE">
+  		SELECT itemId_seq.nextval AS "itemId" FROM DUAL
+  		</selectKey>
+		INSERT INTO ITEM(ITEMID, NAME, PRICE, SALEID)
+		VALUES(#{itemId}, #{name}, #{price}, #{saleId})
+	</insert>
+
+	<update id="updateSales" parameterType="Sales">
+		UPDATE SALES
+		SET NAME=#{ItemName},
+		CATEID=#{cateId},
+		content=#{content},
+		IMAGE = #{image}
+		WHERE SALEID=#{saleId}
+	</update>
+	
+	<update id="updateSaleItem" parameterType="Item">
+		UPDATE ITEM
+		SET NAME=#{name}, 
+			PRICE=#{price}
+		WHERE SALEID=#{saleId}
+	</update>
+
+	<delete id="deleteSales" parameterType="java.lang.String">
+		DELETE FROM SALES
+		WHERE SALEID = #{saleId}
+	</delete>
+	
+	<delete id="deleteSalesItem" parameterType="java.lang.String">
+		DELETE FROM ITEM
+		WHERE SALEID = #{saleId}
+	</delete>
+
+</mapper>

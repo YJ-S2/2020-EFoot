@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.efootstore.dao.mybatis.mapper.GroupBuyingMapper">
+  <cache />    
+  <!-- get -->
+  <select id="getGroupBuying" resultType="com.example.efootstore.domain.GroupBuying">
+  	SELECT GBID, USERID, COUNT, DEADLINE, PLACE, CONTENT, TIMESTAMP, NAME AS "gbName", IMAGE
+  	FROM GROUPBUYING
+  	WHERE GBID=#{gbId}   
+  </select>  
+    
+  <select id="getGroupBuyingList" resultType="com.example.efootstore.domain.GroupBuying">
+  	SELECT GBID, USERID, COUNT, DEADLINE, PLACE, CONTENT, TIMESTAMP, NAME AS "gbName"
+  	FROM GROUPBUYING
+  </select>
+  
+  <select id="getGroupBuyingListByHeader" resultType="com.example.efootstore.domain.GroupBuying">
+  	SELECT GBID, USERID, COUNT, DEADLINE, PLACE, CONTENT, TIMESTAMP, NAME AS "gbName"
+  	FROM GROUPBUYING
+  	WHERE USERID=#{userId}
+  </select>
+           
+  <select id="getApplyerOfGroupBuying" resultType="com.example.efootstore.domain.Account">  	
+  	SELECT A.USERID,
+  		A.NAME,
+  		A.ADDRESS,
+  		A.ZIP,
+  		A.EMAIL,
+  		A.PHONE,
+  		A.POINT
+  	FROM ACCOUNT A, GROUPBUYINGAPPLIER G
+  	WHERE G.GBID=#{gbId} AND A.USERID=G.USERID  		
+  </select>
+  
+  <select id="getMyGroupBuying" resultType="com.example.efootstore.domain.GroupBuying">
+  	SELECT G.GBID AS "gbId", 
+  		G.USERID AS "userId", 
+  		G.COUNT AS "count", 
+  		G.DEADLINE AS "deadLine", 
+  		G.PLACE AS "place", 
+  		G.CONTENT AS "CONTENT",
+  		G.TIMESTAMP AS "timestamp", 
+  		G.NAME AS "gbName"
+  	FROM GROUPBUYING G, GROUPBUYINGAPPLIER GA
+  	WHERE GA.USERID=#{userId} AND GA.GBID=G.GBID
+  </select>
+  
+  <select id="getGroupBuyingItem" resultType="com.example.efootstore.domain.Item">
+  	SELECT ITEMID, GBID, NAME, PRICE
+  	FROM ITEM
+  	WHERE GBID=#{gbId}
+  </select>
+  
+  
+  <!-- insert -->
+  <insert id="insertGroupBuying" parameterType="com.example.efootstore.domain.GroupBuying">    
+  	<selectKey keyProperty="gbId" resultType="String" order="BEFORE">
+  		SELECT gbId_seq.nextval AS "gbId" FROM DUAL
+  	</selectKey>
+  	INSERT INTO GROUPBUYING(GBID, USERID, COUNT, DEADLINE, PLACE, CONTENT, NAME, TIMESTAMP, IMAGE)
+  	VALUES(#{gbId}, #{userId}, #{count}, #{deadLine}, #{place}, #{content}, #{gbName}, SYSDATE, #{image})
+  </insert>
+
+  <insert id="insertGroupBuyingItem" parameterType="com.example.efootstore.domain.Item">    
+  	<selectKey keyProperty="itemId" resultType="String" order="BEFORE">
+  		SELECT itemid_seq.nextval AS "itemId" FROM DUAL
+  	</selectKey>
+  	INSERT INTO ITEM(ITEMID, GBID, NAME, PRICE)
+  	VALUES(#{itemId}, #{gbId}, #{name}, #{price})
+  </insert>
+
+
+  <!-- update -->
+  <update id="updateGroupBuying" parameterType="com.example.efootstore.domain.GroupBuying">    
+  	UPDATE GROUPBUYING
+  	SET 
+  		USERID=#{userId},
+  		COUNT=#{count}, 
+  		DEADLINE=#{deadLine}, 
+  		PLACE=#{place}, 
+  		CONTENT=#{content}, 
+  		NAME=#{gbName}
+  	WHERE GBID=#{gbId, jdbcType=VARCHAR}
+  </update>  
+  
+  <update id="updateGroupBuyingItem" parameterType="com.example.efootstore.domain.Item">    
+  	UPDATE ITEM
+  	SET NAME=#{name}, 
+  		PRICE=#{price}
+  	WHERE GBID=#{gbId, jdbcType=VARCHAR}
+  </update>
+  
+  
+  <!-- delete -->
+  <delete id="deleteGroupBuyingItem" parameterType="java.lang.String">
+  	DELETE FROM ITEM
+  	WHERE GBID=#{gbId} 
+  </delete>
+  
+  <delete id="deleteGroupBuyingApplyer" parameterType="java.lang.String">
+  	DELETE FROM GROUPBUYINGAPPLIER
+  	WHERE GBID=#{gbId} 
+  </delete>
+  
+  <delete id="deleteGroupBuying" parameterType="java.lang.String">
+  	DELETE FROM GROUPBUYING
+  	WHERE GBID=#{gbId} 
+  </delete>
+  
+  
+  <!-- apply -->
+  <insert id="applyGroupBuying" parameterType="java.lang.String">
+  	INSERT INTO GROUPBUYINGAPPLIER(USERID, GBID)
+  	VALUES (#{userId},#{gbId})    
+  </insert>
+
+  <delete id="cancelApplyGroupBuying" parameterType="java.lang.String">    
+  	DELETE FROM GROUPBUYINGAPPLIER
+  	WHERE USERID=#{userId} AND GBID=#{gbId}
+  </delete>
+  
+
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.efootstore.dao.mybatis.mapper.ItemMapper">
+  <cache />
+
+  <select id="getItem" resultType="Item">
+    SELECT NAME, PRICE
+    FROM ITEM 
+    WHERE ITEMID=#{itemId}
+  </select>
+  
+  <select id="searchItemList" resultType="Item">
+    SELECT *
+    FROM ITEM
+    WHERE NAME LIKE #{name}
+  </select>
+  
+
+</mapper>

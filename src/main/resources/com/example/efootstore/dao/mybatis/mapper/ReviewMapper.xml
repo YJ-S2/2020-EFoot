@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.example.efootstore.dao.mybatis.mapper.ReviewMapper">
+	<cache />
+
+	<select id="getMyReviewList" resultType="Review"
+		parameterType="String">
+		SELECT *
+		FROM REVIEW
+		WHERE USERID = #{userId}
+	</select>
+	
+	<select id="getMyReview" resultType="String"
+		parameterType="Review">
+		SELECT USERID
+		FROM REVIEW
+		WHERE USERID = #{userId} AND
+			REVID = #{revId}
+	</select>
+
+	<select id="getReviewList" resultType="Review">
+		SELECT *
+		FROM REVIEW
+	</select>
+
+	<select id="getReview" resultType="Review"
+		parameterType="String">
+		SELECT *
+		FROM REVIEW
+		WHERE REVID = #{revId}
+	</select>
+		
+	<select id="getMyReviewDetail" resultType="Review"
+		parameterType="String">
+		SELECT *
+		FROM REVIEW
+		WHERE REVID = #{revId}
+	</select>
+
+	<insert id="insertReview" parameterType="Review">
+		<selectKey keyProperty="revId" resultType="String" order="BEFORE">
+  		SELECT revId_seq.nextval AS "revId" FROM DUAL
+  		</selectKey>
+		INSERT INTO REVIEW(REVID, TITLE, ADDRESS, CONTENT, GPA, USERID, TIMESTAMP, IMAGE)
+		VALUES(#{revId}, #{title}, #{address}, #{content}, #{gpa},
+		#{userId}, SYSDATE, #{image})
+	</insert>
+
+	<update id="updateReview" parameterType="Review">
+		UPDATE REVIEW SET
+		TITLE = #{title},
+		ADDRESS = #{address},
+		CONTENT = #{content},
+		GPA = #{gpa},
+		IMAGE = #{image}
+		WHERE REVID = #{revId}
+	</update>
+
+	<delete id="deleteReview" parameterType="String">
+		DELETE FROM REVIEW
+		WHERE REVID = #{revId}
+	</delete>
+
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.example.efootstore.dao.mybatis.mapper.ShareMapper">
+	<cache />
+
+	<!--Share getShare(String shId) //Detail// -->
+	<select id="getShare"
+		resultType="com.example.efootstore.domain.Share">
+		SELECT *
+		FROM "SHARE"
+		WHERE SHID=#{shId}
+	</select>
+
+	<!-- List<Share> getShareList() -->
+	<select id="getShareList" resultType="Share">
+		SELECT SHID, USERID, DEADLINE, COUNT, CONTENT, PLACE, NAME
+		FROM "SHARE"
+	</select>
+
+	<!-- List<Share> getShareListByHeader(String userId) -->
+	<select id="getShareListByHeader" resultType="Share">
+		SELECT SHID,USERID,
+		DEADLINE, COUNT, CONTENT, PLACE
+		FROM "Share"
+		WHERE
+		USERID=#{userId}
+	</select>
+	
+	<!--List<Account> getShareApplyerOfList(String shId) -->
+	<select id="getApplyerOfShare" resultType="Account">
+		SELECT A.USERID,
+		A.NAME,
+		A.ADDRESS,
+		A.ZIP,
+		A.EMAIL,
+		A.PHONE,
+		A.POINT
+		FROM ACCOUNT A, SHAREAPPLIER SH
+		WHERE SH.SHID=#{shId} AND A.USERID=SH.USERID
+	</select>
+
+
+
+	<!-- List<Share> getMyShare(String userId) -->
+	<select id="getMyShare" resultType="Share">
+		SELECT *
+		FROM "SHARE" SH, SHAREAPPLIER SHA
+		WHERE SHA.USERID=#{userId} AND SH.SHID=SHA.SHID
+	</select>
+
+
+
+	<!--Item getMyShareItem(String userId) -->
+	<select id="getShareItem" resultType="Item">
+		SELECT ITEMID, SHID, NAME
+		FROM ITEM
+		WHERE SHID=#{shId}
+	</select>
+
+	<!--void insertShare(Share s) -->
+	<insert id="insertShare" parameterType="Share">
+		<selectKey keyProperty="shId" resultType="String"
+			order="BEFORE">
+			SELECT shId_seq.nextval AS "shId" FROM DUAL
+		</selectKey>
+		INSERT INTO "SHARE"(SHID, USERID, PLACE, CONTENT, DEADLINE, TIMESTAMP, COUNT, NAME)
+		VALUES(#{shId}, #{userId}, #{place}, #{content}, #{deadLine}, SYSDATE, #{count},
+		#{name})
+	</insert>
+
+	<!--void insertShareItem(Item item) -->
+	<insert id="insertShareItem" parameterType="Item">
+		<selectKey keyProperty="itemId" resultType="String"
+			order="BEFORE">
+			SELECT ITEMID_seq.nextval AS "itemId" FROM DUAL
+		</selectKey>
+		INSERT INTO ITEM(ITEMID, SHID, NAME, PRICE)
+		VALUES(#{itemId}, #{shId}, #{name}, null)
+	</insert>
+
+	<!--void updateShare() -->
+	<update id="updateShare" parameterType="Share">
+		UPDATE "SHARE" SET
+		deadLine = #{deadLine},
+		count = #{count},
+		content = #{content},
+		place = #{place},
+		name = #{name}
+		WHERE shId = #{shId}
+	</update>
+
+	<!--void updateShareItem(Item item) -->
+	<update id="updateShareItem" parameterType="Item">
+		UPDATE ITEM
+		SET
+		NAME=#{name}
+		WHERE SHID=#{shId}
+	</update>
+
+	<!--void deleteShare() -->
+	<delete id="deleteShare" parameterType="java.lang.String">
+		delete from "SHARE" where shId = #{shId}
+	</delete>
+
+	<!--void deleteShareItem(Item item) -->
+	<delete id="deleteShareItem" parameterType="java.lang.String">
+		delete from ITEM where shId = #{shId}
+	</delete>
+
+	<!--void applyShare(String shId, String userId) -->
+	<insert id="applyShare" parameterType="java.lang.String">
+		INSERT INTO SHAREAPPLIER(USERID, SHID)
+		VALUES (#{userId},#{shId})
+	</insert>
+
+	<!--void cancelApplyShare(String shId, String userId) -->
+	<delete id="cancelApplyShare" parameterType="java.lang.String">
+		DELETE FROM SHAREAPPLIER
+		WHERE (USERID=#{userId} AND SHID=#{shId})
+	</delete>
+</mapper>
+
+
+

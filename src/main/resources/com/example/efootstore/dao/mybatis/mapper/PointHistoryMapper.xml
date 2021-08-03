@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.example.efootstore.dao.mybatis.mapper.PointHistoryMapper">
+	<cache />
+	<select id="getPointListByUserId"
+		resultType="com.example.efootstore.domain.PointHistory">
+		SELECT "DATE", STATUS, USERID, AMOUNT, HISTORY, POINTID
+		FROM POINTHISTORY
+		WHERE USERID = #{userId}
+	</select>
+	<select id="getPoint" resultType="Integer">
+		SELECT POINT
+		FROM ACCOUNT
+		WHERE USERID = #{userId}
+	</select>
+
+	<insert id="insertPointHistory"
+		parameterType="com.example.efootstore.domain.PointHistory">
+		<selectKey keyProperty="pointId" resultType="String"
+			order="BEFORE">
+			SELECT pointId_seq.nextval AS "pointId" FROM DUAL
+		</selectKey>
+		INSERT INTO POINTHISTORY("DATE", STATUS, USERID, AMOUNT, HISTORY,
+		POINTID)
+		VALUES(#{date}, #{status}, #{userId}, #{amount}, #{history}, #{pointId})
+	</insert>
+	
+	<update id="updatePlusPoint">
+		update ACCOUNT set point = point + #{param2}
+		where userId = #{param1}
+	</update>
+	
+	<update id="updateMinusPoint">
+		update ACCOUNT set point = point - #{param2}
+		where userId = #{param1}
+	</update>
+
+</mapper>
